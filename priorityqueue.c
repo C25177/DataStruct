@@ -109,6 +109,16 @@ DefaultCompare(double)
   }\
   return *((T *) queue->start + index);\
 }
+#define Merge(T) void merge_##T(priority_queue_##T *dst, priority_queue_##T *src, int srcbegin, int srcend){\
+  int srcsize = src->ptr - (T *) src->start;\
+  if(srcsize < srcbegin){\
+    printf("srcbegin has out of index, stop merge\n");\
+    return;\
+  }\
+  for(int i = srcbegin; i < srcend && i < srcsize; i++){\
+    dst->push(dst, *((T *) src->start + i));\
+  }\
+}
 #define NewPriorityQueue(T) priority_queue_##T *newpriorityqueue_##T(int (*compare)(const T a, const T b)){\
   priority_queue_##T *queue = (priority_queue_##T *) malloc(sizeof(priority_queue_##T));\
   queue->start = malloc(32 * sizeof(T));\
@@ -124,6 +134,7 @@ DefaultCompare(double)
   queue->clear = clear_##T;\
   queue->find = find_##T;\
   queue->getval = getval_##T;\
+  queue->merge = merge_##T;\
 }
 #define DeletePriorityQueue(T) void deletepriorityqueue_##T(priority_queue_##T *queue){\
   free(queue->start);\
@@ -141,6 +152,7 @@ DefaultCompare(double)
   Clear(T)\
   Find(T)\
   GetVal(T)\
+  Merge(T)\
   NewPriorityQueue(T)\
   DeletePriorityQueue(T)
 
