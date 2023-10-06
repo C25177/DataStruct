@@ -6,6 +6,11 @@
 // Description:
 //------------------------------------------------------------------------
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #define Queue(T) typedef struct queue_##T{\
   void* start;\
   void* end;\
@@ -122,10 +127,14 @@
   node=>rightdegree = 0;\
   return node;\
 }
-#define newtreenode newtreenode_##T
 #define DeleteTreeNode(T) void deletetreenode_##T(treenode_##T *node){\
+  if(!node)return;\
+  deletetreenode_##T(node->left);\
+  deletetreenode_##T(node->right);\
   free(node);\
 }
+#define newtreenode newtreenode_##T
+#define deletetreenode(T) deletetreenode_##T
 #define Tree(T) typedef struct tree_##T{\
   treenode_##T *root;\
   int size;\
@@ -133,8 +142,11 @@
   int (*isempty)(struct tree_##T *this);\
   treenode_##T *(*getroot)(struct tree_##T *tree);\
   void (*insert)(struct tree_##T *this, T val);\
+  int (*heightBFS)(treenode_##T *node);\
   void (*updateheight)(struct tree_##T *this);\
-  int (*balance)(struct tree_##T *this);\
+  void (*balanceBFS)(queue(treenode_##T *) *queue, treenode_##T *node);\
+  void (*linkBFS)(queue(treenode_##T *) *queue, treenode_##T *node, int left, int right);\
+  void (*balance)(struct tree_##T *this);\
 }tree_##T;
 #define tree(T) tree_##T
 #define Isempty(T) int isempty_##T(tree_##T *this){\
@@ -143,10 +155,20 @@
 #define Getroot(T) treenode_##T *getroot_##T(tree_##T *this){\
   return this->root;\
 }
+#define HeightBFS(T) int heightBFS_##T(treenode_##T *node){\
+  if(!node)return 0;\
+  node->height = max(heightBFS_##T(node->left), heightBFS_##T(node->right)) + 1;\
+  return node->height;\
+}
 #define Updateheight(T) void updateheight_##T(tree_##T *this){\
+  this->heightBFS(this->node);\
 }
 #define Insert(T) void insert_##T(tree_##T *this, T val){\
   treenode_##T *node = (treenode_##T *) malloc(sizeof(treenode_##T));\
+  if(!this->root){\
+    root = node;\
+    return;\
+  }\
   treenode_##T *iterator = this->root;\
   while(iterator->left || iterator->right){\
     if(iterator->val == val){\
@@ -168,4 +190,63 @@
       iterator = iterator->right;\
     }\
   }\
+  this->balance(this);\
 }
+#define BalanceBFS(T) void balanceBFS_##T(queue(treenode_##T *) *queue, treenode_##T *node){\
+  if(!node)return;\
+  balanceBFS_##T(queue, node->left);\
+  queue->push(node);\
+  balanceBFS_##T(queue, node->right);\
+}
+#define LinkBFS(T) void linkBFS_##T(queue(treenode_##T *) *queue, treenode_##T *node, int left, int right, int mid){\
+  if(left == right) return;\
+  int leftmid = (left + mid) >> 2;\
+  int rightmid = (right + mid) >> 2;\
+  if(left < mid){\
+    node->left = *((treenode_##T **) queue->start + leftmid);\
+    LinkBFS_##T(queue, node->left, left, mid - 1, leftmid);\
+  }\
+  if(right > mid){\
+    node->right = *((treenode_##T **) queue->start + rightmid);\
+    LinkBFS_##T(queue, node->right, mid + 1, right, rightmid);\
+  }\
+}
+#define Balance(T) void balance_##T(tree_##T *this){\
+  queue(treenode_##T *) *queue = newqueue(treenode_##T *)(this->root->height * 2);\
+  this->balanceBFS(queue, this->root);\
+  int size = queue->size - 1;\
+  int mid = size >> 1;\
+  this->root = *((treenode_##T **) queue->start + mid);\
+  linkBFS_##T(queue, this->root, 0, size, mid);\
+}
+#define NewTree(T) tree_##T *newtree_##T(){\
+  tree_##T *tree = (tree_##T *) malloc(sizeof(tree_##T));\
+  tree->root = NULL;\
+  tree->size = 0;\
+  tree->isempty = isempty_##T;\
+  tree->getroot = getroot_##T;\
+  tree->insert = insert_##T;\
+  tree->heightBFS = heightBFS_##T;\
+  tree->updateheight = updateheight_##T;\
+  tree->balanceBFS = balanceBFS_##T;\
+  tree->linkBFS = linkBFS_##T;\
+  tree->balance = balance_##T;\
+  return tree;\
+}
+#define DeleteTree(T) void deletetree_##T(tree_##T *tree){\
+  deletetreenode_##T(tree->root);\
+  free(tree);\
+}
+#define newtree(T) newtree_##T
+#define deletetree(T) deletetree_##T
+#define DEFINETREE(T) Tree(T)\
+  Isempty(T)\
+  Getroot(T)\
+  HeightBFS(T)\
+  Updateheight(T)\
+  Insert(T)\
+  BalanceBFS(T)\
+  LinkBFS(T)\
+  Balance(T)\
+  NewTree(T)\
+  Deletetree(T)
