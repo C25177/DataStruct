@@ -3,7 +3,7 @@
 // Author: Dragon
 // mail: [beloved25177@126.com](mailto:beloved25177@126.com)
 // Created Time: Mon 02 Oct 2023 10:57:36 CST
-// Description:
+// Description: （平衡）二叉树
 //------------------------------------------------------------------------
 
 #include <stdio.h>
