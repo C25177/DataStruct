@@ -47,7 +47,7 @@
     vector->end = vector->start + size * 2;\
     vector->ptr = vector->start + size;\
   }\
-  memcpy(vector->ptr, &val, sizeof(T));\
+  memcpy((void *) vector->ptr, &val, sizeof(T));\
   vector->ptr += 1;\
 }
 #define Pop_back(T) void pop_back_##T(vector_##T *vector){\
@@ -62,7 +62,7 @@
     return (T)0;\
   }\
   T val;\
-  memcpy(&val, vector->ptr - 1, sizeof(T));\
+  memcpy(&val, (void *) vector->ptr - 1, sizeof(T));\
   return val;\
 }
 #define Front(T) T front_##T(vector_##T *vector){\
