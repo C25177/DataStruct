@@ -114,7 +114,7 @@
 }
 #define Merge(T) void merge_##T(struct vector_##T *dst, struct vector_##T *src, int dstbegin, int srcbegin, int srcend){\
   int srcsize = src->ptr - (T *) src->start;\
-  if(srcbegin > srcsize){\
+  if(srcbegin >= srcsize){\
     printf("begin index has out of range");\
     return;\
   }\

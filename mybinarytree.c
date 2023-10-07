@@ -64,13 +64,6 @@
   free(queue);\
 }
 #define deletequeue(T) deletequeuetreenode_##T
-#define DEFINEQUEUE(T) Queue(T)\
-  Push(T)\
-  Pop(T)\
-  Top(T)\
-  NewQueue(T)\
-  DeleteQueue(T)
-
 // 这里的 size 函数是深度优点算法
 // 广度优先算法需要借助其他数据结构了
 #define TreeNode(T) typedef struct treenode_##T{\
@@ -79,30 +72,30 @@
   struct treenode_##T *left;\
   struct treenode_##T *right;\
   int height;\
-  int (*sizeDFS)(struct treenode_##T *this);\
-  int (*sizeBFS)(struct treenode_##T *this);\
+  void (*nodeDFS)(treenode_##T *this, void (*func)(T val));\
+  void (*nodeBFS)(treenode_##T *this, void (*func)(T val));\
   void (*insertl)(struct treenode_##T *this, struct treenode_##T *node);\
   void (*insertr)(struct treenode_##T *this, struct treenode_##T *node);\
   int (*isleaf)(struct treenode_##T *this);\
   int (*isroot)(struct treenode_##T *this);\
 }treenode_##T;
-#define SizeDFS(T) int sizeDFS_##T(treenode_##T *this){\
-  if(!this)return 0;\
-  return 1 + sizeDFS_##T(this->left) + sizeDFS_##T(this->right);\
+#define NodeDFS(T) void nodeDFS_##T(treenode_##T *this, void (*func)(T val)){\
+  if(!this)return;\
+  func(this->val);\
+  nodeDFS_##T(this->left, func);\
+  nodeDFS_##T(this->right, func);\
 }
-#define SizeBFS(T) int sizeBFS_##T(treenode_##T *this){\
-  int num = 0;\
+#define NodeBFS(T) void nodeBFS_##T(treenode_##T *this, void (*func)(T val)){\
   queue(T) *nodequeue = newqueue(T)(32);\
   nodequeue->push(nodequeue, this);\
   while(nodequeue->size){\
     treenode_##T *node = nodequeue->top(nodequeue);\
     nodequeue->pop(nodequeue);\
     if(!node)continue;\
+    func(node->val);\
     nodequeue->push(nodequeue, node->left);\
     nodequeue->push(nodequeue, node->right);\
-    num++;\
   }\
-  return num;\
 }
 #define InsertL(T) void insertl_##T(treenode_##T *this, treenode_##T *node){\
   this->left = node;\
@@ -127,8 +120,8 @@
   node->right = NULL;\
   node->parent = NULL;\
   node->height = 0;\
-  node->sizeDFS = sizeDFS_##T;\
-  node->sizeBFS = sizeBFS_##T;\
+  node->nodeDFS = nodeDFS_##T;\
+  node->nodeBFS = nodeBFS_##T;\
   node->insertl = insertl_##T;\
   node->insertr = insertr_##T;\
   node->isleaf = isleaf_##T;\
@@ -266,9 +259,14 @@
 #define newtree(T) newtree_##T
 #define deletetree(T) deletetree_##T
 #define DEFINETREE(T)  TreeNode(T)\
-  DEFINEQUEUE(T)\
-  SizeDFS(T)\
-  SizeBFS(T)\
+  Queue(T)\
+  Push(T)\
+  Pop(T)\
+  Top(T)\
+  NewQueue(T)\
+  DeleteQueue(T)\
+  NodeDFS(T)\
+  NodeBFS(T)\
   InsertL(T)\
   InsertR(T)\
   Isleaf(T)\
@@ -300,7 +298,7 @@ int main(){
   tree->insert(tree, 3);
   tree->insert(tree, -1);
   tree->insert(tree, -2);
-  tree->root->sizeDFS(tree->root);
-  tree->root->sizeBFS(tree->root);
+  tree->root->nodeDFS(tree->root);
+  tree->root->nodeBFS(tree->root);
   deletetree(int)(tree);
 }
