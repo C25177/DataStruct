@@ -40,8 +40,8 @@
   queue->size--;\
 }
 #define Top(T) treenode_##T *toptreenode_##T(queuetreenode_##T *queue){\
-  treenode_##T *treenode = *((treenode_##T **) queue->start);\
-  return treenode;\
+  treenode_##T *node = *((treenode_##T **) queue->start);\
+  return node;\
 }
 #define Merge(T) void merge_##T(queuetreenode_##T *dst, queuetreenode_##T *src, int dstbegin, int srcbegin, int srcen){\
   int srcsize = src->ptr - (treenode_##T * *) src->start;\
@@ -82,25 +82,21 @@
   free(queue);\
 }
 #define deletequeue(T) deletequeuetreenode_##T
-#define DEFINEQUEUE(T) Queue(T)\
-  Push(T)\
-  Pop(T)\
-  Top(T)\
-  NewQueue(T)\
-  DeleteQueue(T)
+
 #define TreeNode(T) typedef struct treenode_##T{\
   treenode_##T *parent;\
   queuetreenode_##T *children;\
+  T val;\
   void (*insert)(treenode_##T *this, treenode_##T *node);\
   void (*dfs)(treenode_##T *this, void (*func)(treenode_##T *node));\
   void (*bfs)(treenode_##T *this, void (*func)(treenode_##T *node));\
   int (*isleaf)(struct treenode_##T *this);\
   int (*isroot)(struct treenode_##T *this);\
 }treenode_##T;
-#define nodeInsert(T) void nodeinsert_##T(treenode_##T *this, void (*func)(treenode_##T *node)){\
+#define NodeInsert(T) void nodeinsert_##T(treenode_##T *this, void (*func)(treenode_##T *node)){\
   children->push(node);\
 }
-#define NodeDFS(T) void nodedfs_##T(treenode_##T *this, void (*func)(T val)){\
+#define NodeDFS(T) void nodedfs_##T(treenode_##T *this, void (*func)(treenode_##T *node)){\
   if(!this)return;\
   func(this);\
   nodedfs_##T(this->left, func);\
@@ -117,12 +113,29 @@
     nodequeue->merge(nodequeue, this->children, nodequeue->ptr - (treenode_##T **) node->start, 0, this->children->ptr - (treenode_##T **) this->children->start);\
   }\
 }
-#define Isleaf(T) int isleaf_##T(treenode_##T *this){\
+#define IsLeaf(T) int isleaf_##T(treenode_##T *this){\
   return this->children->ptr == this->children->start;\
 }
-#define Isroot(T) int isroot_##T(treenode_##T *this){\
+#define IsRoot(T) int isroot_##T(treenode_##T *this){\
   return !this->parent;\
 }
+#define NewTreeNode(T) treenode_##T *newtreenode_##T(T val){\
+  treenode_##T *node = (treenode_##T *) malloc(sizeof(treenode_##T));\
+  node->val = val;\
+  node->parent = NULL;\
+  node->children = newqueue();\
+  node->insert = NodeInsert(T);\
+  node->bfs = NodeBFS(T);\
+  node->dfs = NodeDFS(T);\
+  node->isleaf = IsLeaf(T);\
+  node->isroot = IsRoot(T);\
+  return node;\
+}
+#define DeleteTreeNode(T) void deletetreenode_##T(treenode_##T *this){\
+  this->dfs(this, free);\
+}
+#define newtreenode(T) newtreenode_##T
+#define deletetreenode(T) deletetreenode_##T
 #define Tree(T) typedef struct tree_##T{\
   treenode_##T *root;\
   int size;\
@@ -134,3 +147,25 @@
   tree->size = 0;\
   return tree;\
 }
+#define DeleteTree(T) tree_##T *deletetree_##T(tree_##T *this){\
+  deletetreenode(T)(this->root);\
+  free(this);\
+}
+#define DEFINETREE(T) TreeNode(T)\
+  Queue(T)\
+  Push(T)\
+  Pop(T)\
+  Top(T)\
+  NewQueue(T)\
+  DeleteQueue(T)\
+  NodeInsert(T)\
+  NodeDFS(T)\
+  NodeBFS(T)\
+  IsLeaf(T)\
+  IsRoot(T)\
+  NewTreeNode(T)\
+  DeleteTreeNode(T)\
+  Tree(T)\
+  NewTree(T)\
+  DeleteTree(T)
+
