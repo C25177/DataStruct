@@ -12,9 +12,7 @@
 #include <unistd.h>
 
 #define max(x, y) (x) > (y)? (x) : (y)
-
 #define treenode(T) struct treenode_##T
-
 #define Queue(T) typedef struct queuetreenode_##T{\
   void *start;\
   void *end;\
@@ -237,6 +235,7 @@
   int mid = size >> 1;\
   this->root = *((treenode_##T **) queue->start + mid);\
   this->linkBFS(queue, this->root, 0, size, mid);\
+  deletequeue(T) (queue);\
 }
 #define NewTree(T) tree_##T *newtree_##T(){\
   tree_##T *tree = (tree_##T *) malloc(sizeof(tree_##T));\

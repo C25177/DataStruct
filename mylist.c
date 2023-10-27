@@ -89,7 +89,7 @@
       copylength++;\
     }\
     else if(srcbegin < 0){\
-      listnode_##T *node = newListNode(T)(srcit->val);\ 
+      listnode_##T *node = newListNode(T)(srcit->val);\
       copyend->next = node;\
       copyend = copyend->next;\
       copylength++;\

@@ -126,4 +126,11 @@
 #define Tree(T) typedef struct tree_##T{\
   treenode_##T *root;\
   int size;\
+}tree_##T;
+#define tree(T) tree_##T
+#define NewTree(T) tree_##T *newtree_##T(){\
+  tree_##T *tree = (tree_##T *) malloc(sizeof(tree_##T));\
+  tree->root = NULL;\
+  tree->size = 0;\
+  return tree;\
 }
