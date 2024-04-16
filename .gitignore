@@ -2,3 +2,4 @@ build
 .vscode
 a.out
 CMakeLists.txt
+a.exe
