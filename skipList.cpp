@@ -1,3 +1,13 @@
+//----
+// @file skipList.cpp
+// @author mask <beloved25177@126.com>
+// @brief 跳表
+// @version 1.0
+// @date 2024-04-16
+//
+// @copyright Copyright (c) 2024
+//
+//----
 #include <iostream>
 
 #define MAXLEVEL 16
