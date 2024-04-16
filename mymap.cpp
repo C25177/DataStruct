@@ -1,9 +1,8 @@
 #include <iostream>
 #include <map>
 
-template <typename FIRST, typename SECOND>
-class MapNode
-{
+template<typename FIRST, typename SECOND>
+class MapNode {
 private:
 public:
   FIRST first;
@@ -13,12 +12,10 @@ public:
   ~MapNode(SECOND _second, FIRST _first) {}
 };
 
-template <typename KEY, typename VALUE>
-class Map
-{
+template<typename KEY, typename VALUE>
+class Map {
 };
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   std::map<int, int> map;
 }

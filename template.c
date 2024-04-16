@@ -8,14 +8,19 @@
 
 #include <stdio.h>
 
-#define MAX(T) T max_##T (T x, T y){\
-  return ((x > y) ? (x) : (y));}
+#define MAX(T)                    \
+  T max_##T(T x, T y) {           \
+    return ((x > y) ? (x) : (y)); \
+  }
 
 MAX(int)
 MAX(char)
 MAX(float)
 
-#define STR(T) typedef struct STR##T{T val;}STR##T;
+#define STR(T)            \
+  typedef struct STR##T { \
+    T val;                \
+  } STR##T;
 
 STR(int)
 STR(char)
@@ -23,9 +28,9 @@ STR(float)
 
 #define Max(T) max_##T
 #define Str(T) STR##T
-typedef int* intptr;
+typedef int *intptr;
 
-int main(){
+int main() {
   printf("%c\n", Max(char)('a', 'b'));
   printf("%d\n", Max(int)(3, 10));
   printf("%f\n", Max(float)(1.4, 12.3));
@@ -33,5 +38,3 @@ int main(){
   a.val = 199;
   printf("%d\n", a.val);
 }
-
-
